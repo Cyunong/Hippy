@@ -30,6 +30,7 @@
 
 static NSString *const kNormalCell = @"normalCell";
 static NSString *const kDebugCell = @"debugCell";
+static NSString *const kMultiRootCell = @"multiRootCell";
 
 static NSString *const kDriverTypeReact = @"JS React";
 static NSString *const kDriverTypeVue2 = @"JS Vue2";
@@ -44,6 +45,7 @@ static NSString *const kCancel = @"取消";
     NSString *_renderer;
     UITableView *_tableView;
     BOOL _debugMode;
+    BOOL _multiRootMode;
     UIButton *_creationButton;
 }
 
@@ -68,6 +70,7 @@ static NSString *const kCancel = @"取消";
     tableView.backgroundColor = [UIColor clearColor];
     [tableView registerNib:[UINib nibWithNibName:@"PageCreationCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:kNormalCell];
     [tableView registerNib:[UINib nibWithNibName:@"DebugCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:kDebugCell];
+    [tableView registerNib:[UINib nibWithNibName:@"DebugCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:kMultiRootCell];
     [self.contentAreaView addSubview:tableView];
     _tableView = tableView;
     
@@ -84,7 +87,7 @@ static NSString *const kCancel = @"取消";
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 3;
+    return 4;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -117,6 +120,9 @@ static NSString *const kCancel = @"取消";
     if (2 == [indexPath section]) {
         return _debugMode ? 116.f : 58.f;
     }
+    if (3 == [indexPath section]) {
+        return _multiRootMode ? 116.f : 58.f;
+    }
     return 58.f;
 }
 
@@ -142,6 +148,7 @@ static NSString *const kCancel = @"取消";
     }
     else if (2 == [indexPath section]) {
         DebugCell *cell = (DebugCell *)[tableView dequeueReusableCellWithIdentifier:kDebugCell forIndexPath:indexPath];
+        cell.typeLabel.text = @"Debug Mode";
         if (!cell.switchAction) {
             __weak UITableView *weakTableView = tableView;
             __weak DebugCell *weakCell = cell;
@@ -159,6 +166,26 @@ static NSString *const kCancel = @"取消";
         }
         return cell;
     }
+    else if (3 == [indexPath section]) {
+        DebugCell *cell = (DebugCell *)[tableView dequeueReusableCellWithIdentifier:kMultiRootCell forIndexPath:indexPath];
+        cell.typeLabel.text = @"Multi Root";
+        if (!cell.switchAction) {
+            __weak UITableView *weakTableView = tableView;
+            __weak DebugCell *weakCell = cell;
+            __weak PageCreationViewController *weakVC = self;
+            [cell setSwitchAction:^(BOOL flag) {
+                UITableView *strongTableView = weakTableView;
+                DebugCell *strongCell = weakCell;
+                PageCreationViewController *strongVC = weakVC;
+                if (strongTableView && strongCell && strongVC) {
+                    strongCell.debugMode = flag;
+                    strongVC->_multiRootMode = flag;
+                    [strongTableView reloadData];
+                }
+            }];
+        }
+        return cell;
+    }
     else {
         NSAssert(NO, @"no cell returned");
         return nil;
@@ -166,7 +193,7 @@ static NSString *const kCancel = @"取消";
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (2 == [indexPath section]) {
+    if (2 == [indexPath section] || 3 == [indexPath section]) {
         CGRect frame = [cell convertRect:cell.bounds toView:self.view];
         _creationButton.frame = CGRectMake((CGRectGetWidth(self.view.bounds) - CGRectGetWidth(_creationButton.frame)) / 2.f,
                                            CGRectGetMaxY(frame) + 10.f,
@@ -174,10 +201,14 @@ static NSString *const kCancel = @"取消";
                                            CGRectGetHeight(_creationButton.frame));
         _creationButton.hidden = NO;
         
-        if (_debugMode) {
+        if (2 == [indexPath section] && _debugMode) {
             NSString *bundleStr = [HippyBundleURLProvider sharedInstance].bundleURLString;
             DebugCell *dCell = (DebugCell *)cell;
             [dCell setDefaultDebugURLString:bundleStr];
+        }
+        if (3 == [indexPath section] && _multiRootMode) {
+            DebugCell *dCell = (DebugCell *)cell;
+            [dCell setDefaultDebugURLString:@"Demo"];
         }
     }
 }
@@ -262,15 +293,22 @@ static NSString *const kCancel = @"取消";
     DriverType driverType = _currentDriver;
     RenderType renderType = RenderTypeNative;
     NSURL *debugURL = nil;
+    NSString *moduleName = nil;
     if (_debugMode) {
         DebugCell *cell2 = [_tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:2]];
         NSString *debugString = [cell2 debugURLString];
         debugURL = [NSURL URLWithString:debugString];
     }
-    HippyDemoViewController *vc = [[HippyDemoViewController alloc] initWithDriverType:driverType 
+    if (_multiRootMode) {
+        DebugCell *cell3 = [_tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:3]];
+        moduleName = [cell3 debugURLString];
+    }
+    HippyDemoViewController *vc = [[HippyDemoViewController alloc] initWithDriverType:driverType
                                                                            renderType:renderType
                                                                              debugURL:debugURL
-                                                                          isDebugMode:_debugMode];
+                                                                          isDebugMode:_debugMode
+                                                                           moduleName:moduleName
+                                                                      isMultiRootMode:_multiRootMode];
     NSMutableArray<__kindof UIViewController *> *viewControllers = [[self.navigationController viewControllers] mutableCopy];
     [viewControllers removeLastObject];
     [viewControllers addObject:vc];

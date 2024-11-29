@@ -39,13 +39,17 @@
 - (instancetype)initWithDriverType:(DriverType)driverType
                         renderType:(RenderType)renderType
                           debugURL:(NSURL *)debugURL
-                       isDebugMode:(BOOL)isDebugMode {
+                       isDebugMode:(BOOL)isDebugMode
+                        moduleName:(NSString *)moduleName
+                   isMultiRootMode:(BOOL)multiRootMode{
     self = [super init];
     if (self) {
         _driverType = driverType;
         _renderType = renderType;
         _debugURL = debugURL;
         _debugMode = isDebugMode;
+        _moduleName = moduleName;
+        _multiRootMode = multiRootMode;
     }
     return self;
 }
@@ -101,6 +105,9 @@ static HippyBridge *globalBridge = nil;
 - (void)runHippyDemo {
     // Necessary configuration:
     NSString *moduleName = @"Demo";
+    if (_multiRootMode) {
+        moduleName = _moduleName;
+    }
     NSDictionary *launchOptions = @{ @"DebugMode": @(_debugMode) };
     NSDictionary *initialProperties = @{ @"isSimulator": @(TARGET_OS_SIMULATOR) };
     

@@ -35,7 +35,6 @@
     [super awakeFromNib];
     // Initialization code
     self.summaryImageView.image = [UIImage imageFromIconName:@"debug_icon"];
-    self.typeLabel.text = @"Debug Mode";
     self.debugSwitch.on = NO;
     
     self.splitLine.hidden = YES;

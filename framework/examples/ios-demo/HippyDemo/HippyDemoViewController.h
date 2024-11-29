@@ -34,11 +34,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, assign, readonly) RenderType renderType;
 @property(nonatomic, strong, readonly, nullable) NSURL *debugURL;
 @property(nonatomic, assign, readonly, getter=isDebugMode) BOOL debugMode;
+@property(nonatomic, strong, readonly, nullable) NSString *moduleName;
+@property(nonatomic, assign, readonly, getter=isMultiRootMode) BOOL multiRootMode;
 
 - (instancetype)initWithDriverType:(DriverType)driverType
                         renderType:(RenderType)renderType
                           debugURL:(NSURL *)debugURL
-                       isDebugMode:(BOOL)isDebugMode;
+                       isDebugMode:(BOOL)isDebugMode
+                        moduleName:(NSString *)moduleName
+                   isMultiRootMode:(BOOL)multiRootMode;
 
 - (instancetype)initWithPageCache:(HippyPageCache *)pageCache;
 
