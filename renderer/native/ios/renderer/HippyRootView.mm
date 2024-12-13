@@ -257,7 +257,7 @@ HIPPY_NOT_IMPLEMENTED(-(instancetype)initWithCoder : (NSCoder *)aDecoder)
     // Register RootView
     [self.bridge setRootView:contentView];
     // Run Application
-    [self.bridge loadInstanceForRootView:self.hippyTag withProperties:self.appProperties];
+    [self.bridge loadInstance:self.moduleName forRootView:self.hippyTag withProperties:self.appProperties];
     // Call callback if needed
     if ([self.delegate respondsToSelector:@selector(rootViewRunApplicationFinished:)]) {
         __weak __typeof(self)weakSelf = self;

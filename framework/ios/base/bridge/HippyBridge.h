@@ -263,9 +263,10 @@ HIPPY_EXTERN NSString *HippyBridgeModuleNameForClass(Class bridgeModuleClass);
 /// Load instance for hippy root view and show views
 /// This is the Entry of Hippy Application
 /// - Parameters:
+///   - moduleName: module name of rootView
 ///   - rootTag: tag of rootView
 ///   - props: props(appProperties) for hippy frontend application
-- (void)loadInstanceForRootView:(NSNumber *)rootTag withProperties:(nullable NSDictionary *)props;
+- (void)loadInstance:(NSString *)moduleName forRootView:(NSNumber *)rootTag withProperties:(nullable NSDictionary *)props;
 
 /// Unload the instance
 /// - Parameter rootTag: tag of rootView

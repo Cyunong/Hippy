@@ -84,7 +84,7 @@ constexpr char kUnloadInstanceFuncName[] = "__unloadInstance__";
 constexpr char kPerformanceName[] = "performance";
 
 #ifdef ENABLE_INSPECTOR
-constexpr char kHippyModuleName[] = "name";
+constexpr char kHippyContextName[] = "contextName";
 #endif
 constexpr uint64_t kInvalidListenerId = hippy::dom::EventListenerInfo::kInvalidListenerId;
 
@@ -544,15 +544,15 @@ void Scope::LoadInstance(const std::shared_ptr<HippyValue>& value) {
       if (is_fn) {
         auto param = hippy::CreateCtxValue(context, value);
 #ifdef ENABLE_INSPECTOR
-        std::shared_ptr<CtxValue> module_name_value = context->GetProperty(param, kHippyModuleName);
+        std::shared_ptr<CtxValue> context_name_value = context->GetProperty(param, kHippyContextName);
         auto devtools_data_source = weak_data_source.lock();
-        if (module_name_value && devtools_data_source != nullptr) {
-          string_view module_name;
-          bool flag = context->GetValueString(module_name_value, &module_name);
+        if (context_name_value && devtools_data_source != nullptr) {
+          string_view context_name;
+          bool flag = context->GetValueString(context_name_value, &context_name);
           if (flag) {
-            std::string u8_module_name = StringViewUtils::ToStdString(StringViewUtils::ConvertEncoding(
-                module_name, string_view::Encoding::Utf8).utf8_value());
-            devtools_data_source->SetContextName(u8_module_name);
+            std::string u8_context_name = StringViewUtils::ToStdString(StringViewUtils::ConvertEncoding(
+                context_name, string_view::Encoding::Utf8).utf8_value());
+            devtools_data_source->SetContextName(u8_context_name);
           } else {
             FOOTSTONE_DLOG(ERROR) << "module name get error. GetValueString return false";
           }

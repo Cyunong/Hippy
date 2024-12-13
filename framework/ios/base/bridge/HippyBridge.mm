@@ -661,15 +661,16 @@ dispatch_queue_t HippyJSThread;
     }
 }
 
-- (void)loadInstanceForRootView:(NSNumber *)rootTag withProperties:(NSDictionary *)props {
-    [self innerLoadInstanceForRootView:rootTag withProperties:props];
+- (void)loadInstance:(NSString *)moduleName forRootView:(NSNumber *)rootTag withProperties:(NSDictionary *)props {
+    [self innerLoadInstance:(NSString *)moduleName forRootView:rootTag withProperties:props];
 }
 
-- (void)innerLoadInstanceForRootView:(NSNumber *)rootTag withProperties:(NSDictionary *)props {
-    HippyAssert(_moduleName, @"module name must not be null");
+- (void)innerLoadInstance:(NSString *)moduleName forRootView:(NSNumber *)rootTag withProperties:(NSDictionary *)props {
+    HippyAssert(moduleName, @"module name must not be null");
     HippyLogInfo(@"[Hippy_OC_Log][Life_Circle],Running application %@ (%@)", _moduleName, props);
     HippyLogInfo(@"[HP PERF] Begin loading instance for HippyBridge(%p)", self);
-    NSDictionary *param = @{@"name": _moduleName,
+    NSDictionary *param = @{@"name": moduleName,
+                            @"contextName": self.contextName,
                             @"id": rootTag,
                             @"params": props ?: @{},
                             @"version": _HippySDKVersion};

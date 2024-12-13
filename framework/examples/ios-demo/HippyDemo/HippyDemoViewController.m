@@ -113,6 +113,7 @@ static HippyBridge *globalBridge = nil;
     
     HippyBridge *bridge = globalBridge;
     HippyRootView *rootView = nil;
+    Boolean hasBridge = (bridge != nil);
     if (_debugMode) {
         if (!bridge) {
             bridge = [[HippyBridge alloc] initWithDelegate:self
@@ -127,6 +128,9 @@ static HippyBridge *globalBridge = nil;
                                               moduleName:moduleName
                                        initialProperties:initialProperties
                                                 delegate:self];
+        if (hasBridge) {
+            [rootView runHippyApplication];
+        }
     } else {
         NSURL *vendorBundleURL = [self vendorBundleURL];
         NSURL *indexBundleURL = [self indexBundleURL];
